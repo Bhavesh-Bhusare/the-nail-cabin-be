@@ -1,3 +1,6 @@
+import { mongoConnection } from "./config/mongo.js";
+await mongoConnection();
+
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";

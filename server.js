@@ -1,13 +1,13 @@
-import http from "http";
 import "dotenv/config";
-import "./config/mongo.js";
+import http from "http";
 import app from "./app.js";
+import { mongoConnection } from "./config/mongo.js";
 
-const server = http.createServer(app);
+await mongoConnection();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3500;
 
-server.listen(PORT, () => {
+http.createServer(app).listen(PORT, () => {
   console.log(`Express is live on ${PORT}`);
 });
 

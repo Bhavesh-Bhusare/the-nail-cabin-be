@@ -1,51 +1,34 @@
-// Import Packages
 import mongoose from "mongoose";
 
-// Establish Connection to MongoDB Server
-mongoose
-  .connect(process.env.MONGO_URI, {
-    user: process.env.MONGO_USER,
-    pass: process.env.MONGO_PASS,
-    retryWrites: true,
-    w: "majority",
-  })
-  .catch(async (error) => {
-    console.log({
-      name: error?.name || "",
-      message: `Uncaught Exception Occurred\n${error?.message || ""}`,
-      stack: error?.stack || {},
-    });
+let cached = global.mongoose;
 
-    process.exit(0);
-  });
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
-// Create connection Object & Listen for Events
-const mongoConnection = mongoose.connection;
+export async function mongoConnection() {
+  if (cached.conn) return cached.conn;
 
-mongoConnection.on("connected", async () => {
-  console.log({
-    message: "Application Connected to MongoDB Server.",
-    meta_data: {},
-  });
-});
+  if (!cached.promise) {
+    console.log(" Connecting to MongoDB...");
 
-mongoConnection.on("disconnected", async () => {
-  console.log({
-    message: "Application Disconnected from MongoDB Server.",
-    meta_data: {},
-  });
-});
+    cached.promise = mongoose
+      .connect(process.env.MONGO_URI, {
+        user: process.env.MONGO_USER,
+        pass: process.env.MONGO_PASS,
+        retryWrites: true,
+        w: "majority",
+      })
+      .then((mongoose) => {
+        console.log(" MongoDB Connected");
+        return mongoose;
+      })
+      .catch((error) => {
+        console.error(" MongoDB Connection Error:", error.message);
+        throw error;
+      });
+  }
 
-// Disconnect MongoDB Server before quitting Application
-process.on("SIGINT", async () => {
-  await mongoConnection.close().catch(async (error) => {
-    console.log({
-      name: error?.name || "",
-      message: `Uncaught Exception Occurred\n${error?.message || ""}`,
-      stack: error?.stack || {},
-    });
-  });
-});
-
-// Export Connection
-export { mongoConnection };
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
