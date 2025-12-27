@@ -8,13 +8,13 @@ export async function createDailySlots(date) {
   const end = moment(date + " 21:00", "YYYY-MM-DD HH:mm");
 
   while (start.isBefore(end)) {
-    const slotEnd = moment(start).add(90, "minutes");
+    const slotEnd = moment(start).add(60, "minutes");
     if (slotEnd.isAfter(end)) break;
 
     slots.push({
-      start_time: start.format("HH:mm"),
-      end_time: slotEnd.format("HH:mm"),
-      is_available: true,
+      startTime: start.format("HH:mm"),
+      endTime: slotEnd.format("HH:mm"),
+      isAvailable: true,
     });
 
     start = slotEnd;
@@ -23,9 +23,9 @@ export async function createDailySlots(date) {
   return DailySlotModel.create({
     date,
     slots,
-    is_deleted: false,
-    created_timestamp: Date.now(),
-    updated_timestamp: null,
+    isDeleted: false,
+    createdTimestamp: Date.now(),
+    updatedTimestamp: null,
     deleted_timestamp: null,
   });
 }

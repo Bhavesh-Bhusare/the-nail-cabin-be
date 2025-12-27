@@ -43,4 +43,4 @@ export const createBookingSchema = Joi.object({
     "string.length": "Invalid slotId",
     "string.hex": "Invalid slotId",
   }),
-});
+}).unknown();

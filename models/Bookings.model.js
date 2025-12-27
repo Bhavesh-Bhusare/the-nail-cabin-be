@@ -15,41 +15,30 @@ const BookingSchema = new Schema(
       required: true,
     },
 
-    booking_date: {
+    customerId: {
+      type: Schema.Types.ObjectId,
+      ref: "Customers",
+      required: true,
+      index: true,
+    },
+
+    bookingDate: {
       type: String,
       required: true,
       index: true,
     },
 
-    start_time: {
+    startTime: {
       type: String,
       required: true,
     },
 
-    end_time: {
+    endTime: {
       type: String,
       required: true,
     },
 
-    customer_name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    customer_mobile: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    customer_email: {
-      type: String,
-      default: null,
-      trim: true,
-    },
-
-    booking_status: {
+    bookingStatus: {
       type: String,
       enum: ["confirmed", "cancelled", "completed"],
       default: "confirmed",
@@ -61,22 +50,22 @@ const BookingSchema = new Schema(
       default: null,
     },
 
-    is_deleted: {
+    isDeleted: {
       type: Boolean,
       default: false,
     },
 
-    created_timestamp: {
+    createdTimestamp: {
       type: Number,
       required: true,
     },
 
-    updated_timestamp: {
+    updatedTimestamp: {
       type: Number,
       default: null,
     },
 
-    cancelled_timestamp: {
+    cancelledTimestamp: {
       type: Number,
       default: null,
     },

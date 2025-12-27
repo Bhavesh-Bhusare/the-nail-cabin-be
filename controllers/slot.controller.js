@@ -1,5 +1,5 @@
 import moment from "moment";
-import { createDailySlots } from "../services/slot.js";
+import { createDailySlots } from "../services/slot.service.js";
 import DailySlotModel from "../models/Slots.model.js";
 import { HttpStatusCode } from "axios";
 
@@ -12,12 +12,12 @@ export async function getAvailableSlots(req, res, next) {
 
     const existingSlots = await DailySlotModel.findOne({
       date,
-      is_deleted: false,
+      isDeleted: false,
     });
 
     if (existingSlots?.slots?.length) {
       return res.status(HttpStatusCode.Ok).send({
-        error: false,
+        success: true,
         data: existingSlots,
       });
     }
@@ -25,7 +25,7 @@ export async function getAvailableSlots(req, res, next) {
     const createdSlots = await createDailySlots(date);
 
     res.status(HttpStatusCode.Ok).send({
-      error: false,
+      success: true,
       data: createdSlots,
     });
   } catch (error) {

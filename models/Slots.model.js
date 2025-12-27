@@ -11,32 +11,32 @@ const DailySlotSchema = new Schema(
 
     slots: [
       {
-        start_time: {
+        startTime: {
           type: String,
           required: true, // format: HH:mm (24-hour)
         },
-        end_time: {
+        endTime: {
           type: String,
           required: true, // format: HH:mm (24-hour)
         },
-        is_available: {
+        isAvailable: {
           type: Boolean,
           default: true,
         },
       },
     ],
 
-    is_deleted: {
+    isDeleted: {
       type: Boolean,
       default: false,
     },
 
-    created_timestamp: {
+    createdTimestamp: {
       type: Number,
       required: true,
     },
 
-    updated_timestamp: {
+    updatedTimestamp: {
       type: Number,
       default: null,
     },

@@ -8,10 +8,10 @@ import express from "express";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import connectTimeout from "connect-timeout";
-import expressHttpContext from "express-http-context";
+
 import fs from "fs";
 
-import routes from "./routes/routes.js";
+import bookingRoutes from "./routes/booking.js";
 import JWTMiddleware from "./middlewares/jwt.middlerware.js";
 import {
   notFoundHandler,
@@ -19,8 +19,6 @@ import {
 } from "./middlewares/error.middlerware.js";
 
 const app = express();
-
-app.use(expressHttpContext.middleware);
 
 // Core Middlewares
 app.use(helmet());
@@ -58,7 +56,7 @@ app.use(
 );
 
 // Routes
-app.use("/v1", connectTimeout("10s"), routes);
+app.use("/api/v1/bookings", connectTimeout("10s"), bookingRoutes);
 
 // Error Handling
 app.use(notFoundHandler);
