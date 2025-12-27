@@ -11,7 +11,8 @@ import connectTimeout from "connect-timeout";
 
 import fs from "fs";
 
-import bookingRoutes from "./routes/booking.js";
+import bookingRoutes from "./routes/booking.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import JWTMiddleware from "./middlewares/jwt.middlerware.js";
 import {
   notFoundHandler,
@@ -57,6 +58,7 @@ app.use(
 
 // Routes
 app.use("/api/v1/bookings", connectTimeout("10s"), bookingRoutes);
+app.use("/api/v1/admin", connectTimeout("10s"), adminRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

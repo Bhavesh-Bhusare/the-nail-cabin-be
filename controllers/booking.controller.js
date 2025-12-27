@@ -101,6 +101,7 @@ export async function getAllBookings(req, res, next) {
           as: "payments",
         },
       },
+      { $unwind: "$payments" },
 
       { $sort: { createdTimestamp: -1 } },
     ]);

@@ -10,6 +10,8 @@ import {
   getAvailableSlotsSchema,
   createBookingSchema,
 } from "../validators/validation.js";
+import { requireAdmin } from "../middlewares/adminAuth.middleware.js";
+import { addPayment } from "../controllers/payment.controller.js";
 
 const router = express.Router();
 
@@ -21,8 +23,10 @@ router.post(
 
 router.post("/create-booking", validate(createBookingSchema), createBooking);
 
-router.get("/getallbookings", getAllBookings);
+router.get("/getallbookings", requireAdmin, getAllBookings);
 
-router.get("/getbooking/:bookingId", getBookingById);
+router.get("/getbooking/:bookingId", requireAdmin, getBookingById);
+
+router.post("/add-payment", requireAdmin, addPayment);
 
 export default router;

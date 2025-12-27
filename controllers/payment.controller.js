@@ -1,7 +1,7 @@
-import PaymentModel from "../models/Payments.model.js";
-import BookingModel from "../models/Bookings.model.js";
-import { HttpStatusCode } from "axios";
 import httpErrors from "http-errors";
+import { HttpStatusCode } from "axios";
+import BookingModel from "../models/Bookings.model.js";
+import PaymentModel from "../models/Payments.model.js";
 
 export async function addPayment(req, res, next) {
   try {
@@ -9,6 +9,9 @@ export async function addPayment(req, res, next) {
 
     if (!bookingId || !amount || !paymentMode)
       throw httpErrors.BadRequest("Missing required fields");
+
+    if (!["cash", "online"].includes(paymentMode))
+      throw httpErrors.BadRequest("Invalid payment mode");
 
     const booking = await BookingModel.findById(bookingId);
     if (!booking) throw httpErrors.NotFound("Booking not found");
@@ -21,7 +24,7 @@ export async function addPayment(req, res, next) {
     });
 
     res.status(HttpStatusCode.Created).send({
-      error: false,
+      success: true,
       message: "Payment added successfully",
       data: payment,
     });
