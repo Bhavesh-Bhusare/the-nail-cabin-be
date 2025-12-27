@@ -20,14 +20,14 @@ export const verifyCaptcha = (token) => {
         },
       },
       (res) => {
-        console.log(res);
+        // console.log(res);
         let data = "";
 
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => {
           try {
             const parsed = JSON.parse(data);
-            console.log("Captcha result:", parsed);
+            // console.log("Captcha result:", parsed);
             resolve(parsed.success && parsed.score >= 0.5);
           } catch {
             resolve(false);

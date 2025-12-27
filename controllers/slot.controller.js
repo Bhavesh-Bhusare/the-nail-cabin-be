@@ -1,34 +1,48 @@
 import moment from "moment";
-import { createDailySlots } from "../services/slot.service.js";
+import { verifyCaptcha } from "../services/captcha.service.js";
 import DailySlotModel from "../models/Slots.model.js";
 import { HttpStatusCode } from "axios";
 
 export async function getAvailableSlots(req, res, next) {
   try {
-    const m = moment(req.body.date, "YYYY-MM-DD", true);
-    if (!m.isValid()) throw new Error("Invalid date format");
+    const { date, captchaToken } = req.body;
 
-    const date = m.format("YYYY-MM-DD");
-
-    const existingSlots = await DailySlotModel.findOne({
-      date,
-      isDeleted: false,
-    });
-
-    if (existingSlots?.slots?.length) {
-      return res.status(HttpStatusCode.Ok).send({
-        success: true,
-        data: existingSlots,
+    // 1️⃣ Verify captcha
+    const isHuman = await verifyCaptcha(captchaToken);
+    if (!isHuman) {
+      return res.status(HttpStatusCode.Forbidden).json({
+        success: false,
+        message: "Bot verification failed",
       });
     }
 
-    const createdSlots = await createDailySlots(date);
+    // 2️⃣ Validate date
+    const m = moment(date, "YYYY-MM-DD", true);
+    if (!m.isValid()) {
+      return res.status(HttpStatusCode.BadRequest).json({
+        success: false,
+        message: "Invalid date format",
+      });
+    }
 
-    res.status(HttpStatusCode.Ok).send({
+    const formattedDate = m.format("YYYY-MM-DD");
+
+    // 3️⃣ Fetch or create slots
+    let existingSlots = await DailySlotModel.findOne({
+      date: formattedDate,
+      isDeleted: false,
+    });
+
+    if (!existingSlots) {
+      existingSlots = await createDailySlots(formattedDate);
+    }
+
+    return res.status(HttpStatusCode.Ok).json({
       success: true,
-      data: createdSlots,
+      data: existingSlots,
     });
   } catch (error) {
+    console.error("getAvailableSlots error:", error);
     next(error);
   }
 }

@@ -9,8 +9,6 @@ import { findOrCreateCustomer } from "../services/customer.service.js";
 import { verifyCaptcha } from "../services/captcha.service.js";
 
 export async function createBooking(req, res, next) {
-  const session = await mongoose.startSession();
-
   try {
     const {
       customerName,
@@ -21,10 +19,8 @@ export async function createBooking(req, res, next) {
       slotId,
       captchaToken,
     } = req.body;
-    console.log(req.body);
 
     const isHuman = await verifyCaptcha(captchaToken);
-    console.log(isHuman);
 
     if (!isHuman) {
       throw httpErrors.BadRequest("Bot verification failed");
@@ -37,14 +33,11 @@ export async function createBooking(req, res, next) {
     const m = moment(date, "YYYY-MM-DD", true);
     if (!m.isValid()) throw new Error("Invalid date format");
 
-    // session.startTransaction();
-
     // Find Slot deatails
     const dailySlot = await DailySlotModel.findOne({
       _id: dateId,
       date: m.format("YYYY-MM-DD"),
     });
-    // .session(session);
 
     if (!dailySlot) throw httpErrors.NotFound("Date not found");
 
@@ -53,33 +46,28 @@ export async function createBooking(req, res, next) {
       throw httpErrors.Conflict("Slot unavailable");
 
     // Find or create a customer
-    const customer = await findOrCreateCustomer(
-      { customerName, customerMobile, customerEmail }
-      // session
-    );
+    const customer = await findOrCreateCustomer({
+      customerName,
+      customerMobile,
+      customerEmail,
+    });
 
     // create booking
-    const [booking] = await BookingModel.create(
-      [
-        {
-          dateId,
-          slotId,
-          customerId: customer._id,
-          bookingDate: m.format("YYYY-MM-DD"),
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          createdTimestamp: Date.now(),
-        },
-      ]
-      // { session }
-    );
+    const [booking] = await BookingModel.create([
+      {
+        dateId,
+        slotId,
+        customerId: customer._id,
+        bookingDate: m.format("YYYY-MM-DD"),
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        createdTimestamp: Date.now(),
+      },
+    ]);
 
     // Update slot
     slot.isAvailable = false;
     await dailySlot.save();
-
-    // await session.commitTransaction();
-    // session.endSession();
 
     res.status(HttpStatusCode.Created).send({
       success: true,
@@ -87,10 +75,6 @@ export async function createBooking(req, res, next) {
       bookingId: booking._id,
     });
   } catch (error) {
-    // if (session.transaction) {
-    //   await session.abortTransaction();
-    //   session.endSession();
-    // }
     console.log(error);
     next(error);
   }

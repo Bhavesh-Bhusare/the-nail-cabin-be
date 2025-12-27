@@ -10,7 +10,7 @@ export const getAvailableSlotsSchema = Joi.object({
       "string.empty": "Date is required",
       "any.required": "Date is required",
     }),
-});
+}).unknown();
 
 // Validate Create Booking API
 export const createBookingSchema = Joi.object({
