@@ -2,6 +2,7 @@ import moment from "moment";
 import { verifyCaptcha } from "../services/captcha.service.js";
 import DailySlotModel from "../models/Slots.model.js";
 import { HttpStatusCode } from "axios";
+import { createDailySlots } from "../services/slot.service.js";
 
 export async function getAvailableSlots(req, res, next) {
   try {
